@@ -1,0 +1,55 @@
+#!/bin/sh
+
+retval=0
+
+error(){
+	printf -- "- $*\n" >&2
+	retval=1
+}
+
+#定义Type类型
+TYPE=(backlog feat fix docs style refactor test chore revert merge)
+
+comment_pat='^#'
+reference_pat='^\[[[:digit:]]\]'
+subject_bad_start_pat='^[[:punct:]]'
+subject_bad_end_pat='[[:punct:]]$'
+
+line_num=0
+while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ $line =~ $comment_pat ]] && continue
+    [[ $line =~ $reference_pat ]] && continue
+
+    line_num=$((line_num+1))
+    length=${#line}
+
+    if [[ $line_num -eq 1 ]]; then
+        # [[ $length -gt 50 ]] &&
+        #     error "subject line exceeds 50 characters\ $line"
+
+        # [[ $line =~ $subject_bad_start_pat ]] &&
+        #     error "subject line not capitalised\n $line"
+		#
+        # [[ $line =~ $subject_bad_end_pat ]] &&
+        #     error "subject line terminated by punctuation\n $line"
+		TYPE_NUM=0
+		for var in "${TYPE[@]}"; do
+			if [[ (-z `echo $line | egrep -i "^$var"`) ]]; then
+				TYPE_NUM=$(($TYPE_NUM+1))
+			fi
+		done
+		if [[ $TYPE_NUM -eq ${#TYPE[@]} ]]; then
+			error "Commit messgae format is incorrect!\n Does not match '<type>(<scope>): <subject>' ! \n $line"
+		fi
+
+    elif [[ $line_num -eq 2 ]]; then
+        [[ $length -ne 0 ]] &&
+            error "subject line followed by non-empty line\n $line"
+
+    else
+        [[ $length -gt 72 ]] &&
+            error "line $line_num exceeds 72 characters\n $line"
+    fi
+done < "$1"
+
+exit $retval
