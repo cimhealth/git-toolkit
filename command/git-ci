@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 TYPE=(backlog feat fix docs style refactor test chore)
 
-echo "Select the type of change that you're committing:
+echo "选择您正在提交的类型:
     1. backlog: 开始一个新的backlog
     2. feat: 新功能（feature）
     3. fix: 修补bug
@@ -13,26 +13,26 @@ echo "Select the type of change that you're committing:
     8. chore: 构建过程或辅助工具的变动
     0. quit: 退出
 "
-read -p "Enter selection [0-8]> "
+read -p "请选择相关数字选项 [0-8]> "
 
 if [[ $REPLY =~ ^[0-8]$ ]]; then
     if [[ $REPLY == 0 ]]; then
-        echo "Program Quit."
+        echo "退出本次提交"
         exit
     fi
     type=${TYPE[$REPLY-1]}
 else
-    echo "Invalid entry." >&2
+    echo "无效的输入" >&2
     exit 1
 fi
 
-echo 'Denote the scope of this change ($location, $browser, $compile, etc.):'
+echo '本次提交的范围，建议填写版本号 ($version):'
 read -p '' scope
-echo "Write a short, imperative tense description of the change:"
+echo "请添加简短的，必要的对本次提交的描述:"
 read -p '' subject
-echo "Provide a longer description of the change:"
+echo "添加一个完整提交的描述:"
 read -p '' body
-echo "List any breaking changes or issues closed by this change:"
+echo "列出本次提交解决的、可以关闭的所有相关问题，建议使用关键字 refs 、 close:"
 read -p '' footer
 
 SOB=$(git var GIT_AUTHOR_IDENT | sed -n 's/^\(.*>\).*$/Signed-off-by: \1/p')
