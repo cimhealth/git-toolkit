@@ -40,6 +40,9 @@ function uninstall() {
         echo "The '$COMMAND_PATH_PREFIX' directory was not found."
         echo "Do you need to set COMMAND_PATH_PREFIX ?"
     fi
+
+    git config --global --unset commit.template
+    git config --global --unset core.hooksPath
 }
 
 function help() {
@@ -51,8 +54,8 @@ function help() {
 
 function install() {
     echo "Installing git-toolkit to $COMMAND_PATH_PREFIX"
-    # clone
-    # install_cmd
+    clone
+    install_cmd
     install_config
     install_hooks
 }
@@ -83,13 +86,14 @@ function install_config() {
     echo "Install Git Config......"
     ALIAS=`git config --list|grep 'alias.ci'`
     if [[ -n "$ALIAS" ]]; then
-        git config --global --unset alias.cigit
+        git config --global --unset alias.ci
     fi
     git config --global commit.template "$INSTALL_PATH/$CONFIG/$TEMPLATE_FILES"
 }
 
 function install_hooks() {
     echo "Install Git Hooks......"
+    git config core.hooksPath "$INSTALL_PATH/$HOOKS"
 }
 
 echo "### git-toolkit no-make installer ###"
