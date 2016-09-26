@@ -25,7 +25,7 @@ function init() {
 }
 # 卸载
 function uninstall() {
-    if [[ -d "$INSTALL_PATH" && -d "$INSTALL_PATH/.git" ]]; then
+    if [ -d "$INSTALL_PATH" -a -d "$INSTALL_PATH/.git" ] ; then
         echo "Uninstalling git-toolkit."
         rm -rf "$INSTALL_PATH"
     fi
@@ -68,9 +68,11 @@ function clone() {
         cd -
     else
         echo "Cloning repo from GitHub to $INSTALL_PATH"
-        git clone "$REPO_HOME" "$INSTALL_PATH"
-        chmod -R 755 $INSTALL_PATH/$COMMAND
-        chmod -R 755 $INSTALL_PATH/$HOOKS
+        cd ~
+        git clone "$REPO_HOME" ".$REPO_NAME"
+        cd -
+        chmod -R 755 "$INSTALL_PATH/$COMMAND"
+        chmod -R 755 "$INSTALL_PATH/$HOOKS"
     fi
 }
 
@@ -93,7 +95,7 @@ function install_config() {
 
 function install_hooks() {
     echo "Install Git Hooks......"
-    git config core.hooksPath "$INSTALL_PATH/$HOOKS"
+    git config --global core.hooksPath "$INSTALL_PATH/$HOOKS"
 }
 
 echo "### git-toolkit no-make installer ###"
