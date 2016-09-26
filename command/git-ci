@@ -1,5 +1,13 @@
 #!/bin/sh
 
+# 验证当前是否为Git项目
+function verify {
+    if [[ ! -d "$(pwd)/.git" ]]; then
+        echo "fatal: Not a git repository (or any of the parent directories): .git"
+        exit 1
+    fi
+}
+
 TYPE=(backlog feat fix docs style refactor test chore)
 
 echo "选择您正在提交的类型:
