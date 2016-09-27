@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #初始化变量
 function init() {
     COMMAND="command"
@@ -20,18 +20,20 @@ function init() {
         COMMAND_PATH_PREFIX="/usr/local/bin"
     fi
     if [[ -z "$INSTALL_PATH" ]]; then
-        INSTALL_PATH="~/.$REPO_NAME"
+        INSTALL_PATH="/usr/local/$REPO_NAME"
     fi
 }
 # 卸载
 function uninstall() {
-    if [ -d "$INSTALL_PATH" -a -d "$INSTALL_PATH/.git" ] ; then
-        echo "Uninstalling git-toolkit."
+    if [[  -d "$INSTALL_PATH" ]]; then
+        echo "Uninstalling $REPO_NAME"
         rm -rf "$INSTALL_PATH"
+    else
+        echo "$INSTALL_PATH is no existing."
     fi
 
     if [ -d "$COMMAND_PATH_PREFIX" ] ; then
-        echo "Uninstalling git-toolkit command from $COMMAND_PATH_PREFIX"
+        echo "Uninstalling $REPO_NAME command from $COMMAND_PATH_PREFIX"
         for script_file in $SCRIPT_FILES ; do
             echo "rm -vf $COMMAND_PATH_PREFIX/$script_file"
             rm -vf "$COMMAND_PATH_PREFIX/$script_file"
@@ -45,21 +47,24 @@ function uninstall() {
     git config --global --unset core.hooksPath
 }
 
+# 使用帮助
 function help() {
-    echo "Usage: [environment] git-toolkit installer.sh [install|uninstall]"
+    echo "Usage: [environment] $REPO_NAME installer.sh [install|uninstall]"
     echo "Environment:"
     echo "   COMMAND_PATH_PREFIX=$COMMAND_PATH_PREFIX"
     echo "   INSTALL_PATH=$INSTALL_PATH"
 }
 
+# 安装 git-toolkit
 function install() {
-    echo "Installing git-toolkit to $COMMAND_PATH_PREFIX"
+    echo "Installing $REPO_NAME to $COMMAND_PATH_PREFIX"
     clone
     install_cmd
     install_config
     install_hooks
 }
 
+# clone项目
 function clone() {
     if [ -d "$INSTALL_PATH" -a -d "$INSTALL_PATH/.git" ] ; then
         echo "Using existing repo: $REPO_NAME"
@@ -68,14 +73,13 @@ function clone() {
         cd -
     else
         echo "Cloning repo from GitHub to $INSTALL_PATH"
-        cd ~
-        git clone "$REPO_HOME" ".$REPO_NAME"
-        cd -
+        git clone "$REPO_HOME" "$INSTALL_PATH"
         chmod -R 755 "$INSTALL_PATH/$COMMAND"
         chmod -R 755 "$INSTALL_PATH/$HOOKS"
     fi
 }
 
+# 安装命令
 function install_cmd() {
     echo "Install Git Command......"
     mkdir -p $COMMAND_PATH_PREFIX
@@ -83,7 +87,7 @@ function install_cmd() {
         ln -s "$INSTALL_PATH/$COMMAND/$script_file" "$COMMAND_PATH_PREFIX/$script_file"
     done
 }
-
+# 安装配置
 function install_config() {
     echo "Install Git Config......"
     ALIAS=`git config --list|grep 'alias.ci'`
@@ -93,13 +97,14 @@ function install_config() {
     git config --global commit.template "$INSTALL_PATH/$CONFIG/$TEMPLATE_FILES"
 }
 
+# 安装hook脚本
 function install_hooks() {
     echo "Install Git Hooks......"
     git config --global core.hooksPath "$INSTALL_PATH/$HOOKS"
 }
 
-echo "### git-toolkit no-make installer ###"
 init
+echo "### $REPO_NAME no-make installer ###"
 case $1 in
     uninstall)
         uninstall
