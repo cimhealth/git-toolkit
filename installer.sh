@@ -38,6 +38,8 @@ function uninstall() {
             echo "rm -vf $COMMAND_PATH_PREFIX/$script_file"
             rm -vf "$COMMAND_PATH_PREFIX/$script_file"
         done
+
+        rm -vf "$COMMAND_PATH_PREFIX/$REPO_NAME"
     else
         echo "The '$COMMAND_PATH_PREFIX' directory was not found."
         echo "Do you need to set COMMAND_PATH_PREFIX ?"
@@ -86,6 +88,8 @@ function install_cmd() {
     for script_file in $SCRIPT_FILES ; do
         ln -s "$INSTALL_PATH/$COMMAND/$script_file" "$COMMAND_PATH_PREFIX/$script_file"
     done
+
+    ln -s "$INSTALL_PATH/installer.sh" "$COMMAND_PATH_PREFIX/$REPO_NAME"
 }
 # 安装配置
 function install_config() {
