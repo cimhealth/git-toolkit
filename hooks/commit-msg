@@ -8,7 +8,7 @@ error(){
 }
 
 #定义Type类型
-TYPE=(backlog feat fix docs style refactor test chore revert merge)
+TYPE=("backlog" "feat" "fix" "docs" "style" "refactor" "test" "chore" "revert" "\[maven" "merge")
 
 comment_pat='^#'
 reference_pat='^\[[[:digit:]]\]'
