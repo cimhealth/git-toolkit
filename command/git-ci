@@ -1,6 +1,10 @@
 #!/bin/sh
-
-TYPE=(backlog feat fix docs style refactor test chore)
+function init() {
+    LANG="zh_CN.UTF-8"
+    LC_CTYPE="zh_CN.UTF-8"
+    export LANG LC_CTYPE
+    TYPE=(backlog feat fix docs style refactor test chore)
+}
 
 # 验证当前是否为Git项目
 function verify {
@@ -79,6 +83,7 @@ function run() {
 
 case $1 in
     *)
+        init
         verify
         mainMessage
         otherMessage
