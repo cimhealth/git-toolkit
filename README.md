@@ -1,6 +1,7 @@
-# Git Utils
+# Git Toolkit
 
-Git工具集
+
+> 人类懒惰的本性和不满足的本性是趋势科技发展的源泉......
 
 ## 安装
 
@@ -16,7 +17,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/tonydeng/git-toolkit/maste
 sh -c "$(wget https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh -O -)"
 ```
 
-## 工具集介绍
+## git toolkit介绍
 
 本工具集包含几个部分，自定义命令，Hook脚本，以及配置模板
 
@@ -39,7 +40,9 @@ git toolkit uninstall
 
 #### git ci
 
-提供交互式`git commit`的命令，用于定制统一`commit message`
+提供交互式`git commit`的命令，用于定制统一`commit message`。
+
+> 用于替换[Commitizen](https://github.com/commitizen/cz-cli)
 
 ```bash
 git ci
