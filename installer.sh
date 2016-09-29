@@ -14,7 +14,7 @@ function init() {
     fi
 
     if [[ -z "$REPO_HOME" ]]; then
-        REPO_HOME="git@github.com:tonydeng/git-toolkit.git"
+        REPO_HOME="https://github.com/tonydeng/git-toolkit.git"
     fi
     if [[ -z "$COMMAND_PATH_PREFIX" ]]; then
         COMMAND_PATH_PREFIX="/usr/local/bin"
