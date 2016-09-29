@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 function init() {
     LOCALE=(LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME LC_ALL)
     LANGUAGE="zh_CN.UTF-8"
@@ -29,7 +29,7 @@ function mainMessage() {
         8. chore: 构建过程或辅助工具的变动
         0. quit: 退出
     "
-    read -e -p "请选择相关数字选项 [0-8]> "
+    read -e -n 1 -p "请选择相关数字选项 [0-8]> "
 
     if [[ $REPLY =~ ^[0-8]$ ]]; then
         if [[ $REPLY == 0 ]]; then
@@ -57,13 +57,11 @@ function otherMessage() {
 }
 # 构建消息
 function build() {
-    ALL=""
     if [[ -z $@ ]]; then
         ALL="-a"
     else
         ALL=$@
     fi
-
     MSGFILE=".git/COMMIT-MSG.tmp"
 
     echo "$type($scope): $subject" > $MSGFILE
@@ -88,14 +86,13 @@ function run() {
 
 case $1 in
     *)
-        set -o
         init
         verify
         mainMessage
         otherMessage
-        build
+        build "$@"
         run
         clean
-        set -e
+
         ;;
 esac
