@@ -29,7 +29,7 @@ function mainMessage() {
         8. chore: 构建过程或辅助工具的变动
         0. quit: 退出
     "
-    read -p "请选择相关数字选项 [0-8]> "
+    read -e -p "请选择相关数字选项 [0-8]> "
 
     if [[ $REPLY =~ ^[0-8]$ ]]; then
         if [[ $REPLY == 0 ]]; then
@@ -42,13 +42,13 @@ function mainMessage() {
         exit 1
     fi
     echo '本次提交的范围，建议填写版本号 ($version):'
-    read  scope
+    read -e scope
     echo "请添加简短的，必要的对本次提交的描述:"
-    read  subject
+    read -e subject
     echo "添加一个完整提交的描述:"
-    read  body
+    read -e body
     echo "列出本次提交解决的、可以关闭的所有相关问题，建议使用关键字 refs 、 close:"
-    read  footer
+    read -e footer
 }
 # 其他消息内容
 function otherMessage() {
@@ -88,6 +88,7 @@ function run() {
 
 case $1 in
     *)
+        set -o
         init
         verify
         mainMessage
@@ -95,5 +96,6 @@ case $1 in
         build
         run
         clean
+        set -e
         ;;
 esac
