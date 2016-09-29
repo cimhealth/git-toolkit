@@ -51,7 +51,7 @@ function uninstall() {
 
 # 使用帮助
 function help() {
-    echo "Usage: [environment] $REPO_NAME installer.sh [install|uninstall]"
+    echo "Usage: [environment] $REPO_NAME installer.sh [install|uninstall|update]"
     echo "Environment:"
     echo "   COMMAND_PATH_PREFIX=$COMMAND_PATH_PREFIX"
     echo "   INSTALL_PATH=$INSTALL_PATH"
@@ -64,6 +64,11 @@ function install() {
     install_cmd
     install_config
     install_hooks
+}
+
+function update() {
+    echo "Update $REPO_NAME"
+    install
 }
 
 # clone项目
@@ -113,6 +118,10 @@ case $1 in
     uninstall)
         uninstall
 		exit
+        ;;
+    update)
+        update
+        exit
         ;;
     help)
         help
