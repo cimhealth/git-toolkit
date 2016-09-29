@@ -10,7 +10,8 @@ function init() {
 
 # 验证当前是否为Git项目
 function verify {
-    if [[ ! -d "$(pwd)/.git" ]]; then
+    git status &>/dev/null
+    if [[ $? -ne 0 ]]; then
         echo "fatal: Not a git repository (or any of the parent directories): .git"
         exit 1
     fi
@@ -70,6 +71,8 @@ function build() {
     echo "$body" >> $MSGFILE
     echo "" >> $MSGFILE
     echo "$footer" >> $MSGFILE
+    echo "" >> $MSGFILE
+    echo "$SOB" >> $MSGFILE
 
 }
 # 清除临时文件
