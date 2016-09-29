@@ -34,8 +34,15 @@ git toolkit help
 ```
 
 **卸载本工具集**
+
 ```bash
 git toolkit uninstall
+```
+
+**更新本工具集**
+
+```bash
+git toolkit update
 ```
 
 #### git ci
