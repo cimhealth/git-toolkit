@@ -7,7 +7,6 @@ function init() {
 
     SCRIPT_FILES="git-ci"
     TEMPLATE_FILES="git-message-template"
-    HOOK_FILES="commit-msg"
 
     if [[ -z "$REPO_NAME" ]]; then
         REPO_NAME="git-toolkit"
