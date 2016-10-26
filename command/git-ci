@@ -10,10 +10,11 @@ function init() {
 
 # 验证当前是否为Git项目
 function verify {
-    git status &>/dev/null
-    if [[ $? -ne 0 ]]; then
-        echo "fatal: Not a git repository (or any of the parent directories): .git"
-        exit 1
+    git rev-parse --show-toplevel > /dev/null 2>&1
+    GIT_VERIFY=$?
+    if test $GIT_VERIFY != 0; then
+      >&2 echo "fatal: Not a git repository (or any of the parent directories): .git"
+      exit $GIT_VERIFY
     fi
 }
 # 消息主体
@@ -62,7 +63,7 @@ function build() {
     else
         ALL=$@
     fi
-    MSGFILE=".git/COMMIT-MSG.tmp"
+    MSGFILE="`git rev-parse --git-dir`COMMIT-MSG.tmp"
 
     echo "$type($scope): $subject" > $MSGFILE
     echo "" >> $MSGFILE
@@ -73,17 +74,16 @@ function build() {
     echo "$SOB" >> $MSGFILE
 
 }
-# 清除临时文件
-function clean() {
-    rm -f $MSGFILE
-}
 # 执行提交
 function run() {
     GIT_COMMIT_CMD="git commit -F $MSGFILE $ALL"
     echo $GIT_COMMIT_CMD
     eval $GIT_COMMIT_CMD
 }
-
+# 清除临时文件
+function clean() {
+    rm -f $MSGFILE
+}
 case $1 in
     *)
         init
