@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 retval=0
 
@@ -12,8 +12,8 @@ TYPE=("backlog" "feat" "fix" "docs" "style" "refactor" "test" "chore" "revert" "
 
 comment_pat='^#'
 reference_pat='^\[[[:digit:]]\]'
-subject_bad_start_pat='^[[:punct:]]'
-subject_bad_end_pat='[[:punct:]]$'
+# subject_bad_start_pat='^[[:punct:]]'
+# subject_bad_end_pat='[[:punct:]]$'
 
 line_num=0
 while IFS= read -r line || [[ -n "$line" ]]; do
