@@ -72,11 +72,11 @@ function update() {
 
 # clone项目
 function clone() {
-    if [ -d "$INSTALL_PATH" -a -d "$INSTALL_PATH/.git" ] ; then
+    if [ -d "$INSTALL_PATH" ] && [ -d "$INSTALL_PATH/.git" ] ; then
         echo "Using existing repo: $REPO_NAME"
-        cd $INSTALL_PATH
+        cd $INSTALL_PATH || exit 1
         git pull
-        cd -
+        cd -  ||  exit 1
     else
         echo "Cloning repo from GitHub to $INSTALL_PATH"
         git clone "$REPO_HOME" "$INSTALL_PATH"
