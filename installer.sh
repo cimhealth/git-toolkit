@@ -72,11 +72,11 @@ function update() {
 
 # clone项目
 function clone() {
-    if [ -d "$INSTALL_PATH" -a -d "$INSTALL_PATH/.git" ] ; then
+    if [ -d "$INSTALL_PATH" ] && [ -d "$INSTALL_PATH/.git" ] ; then
         echo "Using existing repo: $REPO_NAME"
-        cd $INSTALL_PATH
+        cd $INSTALL_PATH || exit 1
         git pull
-        cd -
+        cd -  ||  exit 1
     else
         echo "Cloning repo from GitHub to $INSTALL_PATH"
         git clone "$REPO_HOME" "$INSTALL_PATH"
@@ -90,10 +90,10 @@ function install_cmd() {
     echo "Install Git Command......"
     mkdir -p $COMMAND_PATH_PREFIX
     for script_file in $SCRIPT_FILES ; do
-        ln -s "$INSTALL_PATH/$COMMAND/$script_file" "$COMMAND_PATH_PREFIX/$script_file"
+        ln -s "$INSTALL_PATH/$COMMAND/$script_file" "$COMMAND_PATH_PREFIX/$script_file" > /dev/null 2>&1 || echo "$COMMAND_PATH_PREFIX/$script_file installed."
     done
 
-    ln -s "$INSTALL_PATH/installer.sh" "$COMMAND_PATH_PREFIX/$REPO_NAME"
+    ln -s "$INSTALL_PATH/installer.sh" "$COMMAND_PATH_PREFIX/$REPO_NAME" > /dev/null 2>&1 || echo "$COMMAND_PATH_PREFIX/$REPO_NAME installed."
 }
 # 安装配置
 function install_config() {
