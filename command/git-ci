@@ -2,7 +2,7 @@
 function init() {
     LOCALE=(LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NUMERIC LC_TIME LC_ALL)
     LANGUAGE="zh_CN.UTF-8"
-    for l in $LOCALE ; do
+    for l in "${LOCALE[@]}" ; do
         export "$l=$LANGUAGE"
     done
     TYPE=(backlog feat fix docs style refactor test chore)
@@ -61,7 +61,7 @@ function build() {
     if [[ -z $@ ]]; then
         ALL="-a"
     else
-        ALL=$@
+        ALL=$*
     fi
     MSGFILE="`git rev-parse --git-dir`COMMIT-MSG.tmp"
 

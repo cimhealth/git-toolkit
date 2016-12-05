@@ -1,20 +1,20 @@
 # Git Toolkit
 
 
-> 人类懒惰的本性和不满足的本性是趋势科技发展的源泉......
+> 人类懒惰的本性和不满足的本性是驱使科技发展的源泉......
 
 ## 安装
 
 **使用curl**
 
 ```bash
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh)"
 ```
 
 **使用wget**
 
 ```bash
-sh -c "$(wget https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh -O -)"
+bash -c "$(wget https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh -O -)"
 ```
 
 ## git toolkit介绍

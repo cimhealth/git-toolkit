@@ -8,6 +8,8 @@ function init() {
     SCRIPT_FILES="git-ci"
     TEMPLATE_FILES="git-message-template"
 
+    USER_HOME="$(env|grep ^HOME=|cut -c 6-)"
+
     if [[ -z "$REPO_NAME" ]]; then
         REPO_NAME="git-toolkit"
     fi
@@ -15,11 +17,28 @@ function init() {
     if [[ -z "$REPO_HOME" ]]; then
         REPO_HOME="https://github.com/tonydeng/git-toolkit.git"
     fi
-    if [[ -z "$COMMAND_PATH_PREFIX" ]]; then
-        COMMAND_PATH_PREFIX="/usr/local/bin"
+
+    COMAND_PATHS=("/usr/local/bin" "$USER_HOME/bin")
+    INSTALL_PATHS=("/usr/local/$REPO_NAME" "$USER_HOME/.$REPO_NAME")
+    PATH_NUM=0
+    for p in "${COMAND_PATHS[@]}" ; do
+        if [[ "$(echo $PATH | grep "${p}")" ]]; then
+            touch "$p/git-toolkit-temp" > /dev/null 2>&1
+            if [[ $? == 0 ]]; then
+                COMMAND_PATH_PREFIX="$p"
+                rm "$p/git-toolkit-temp" > /dev/null 2>&1
+                break;
+            fi
+        fi
+        PATH_NUM=$(($PATH_NUM+1))
+    done
+    if [[ $PATH_NUM =~ ^[0-${#COMAND_PATHS[@]-1}] ]]; then
+        INSTALL_PATH=${INSTALL_PATHS[PATH_NUM]}
     fi
-    if [[ -z "$INSTALL_PATH" ]]; then
-        INSTALL_PATH="/usr/local/$REPO_NAME"
+
+    if [[ -z "$COMMAND_PATH_PREFIX" || -z "$INSTALL_PATH" ]]; then
+        echo "$REPO_NAME Environment init failt!"
+        exit 1;
     fi
 }
 # 卸载
@@ -51,9 +70,6 @@ function uninstall() {
 # 使用帮助
 function help() {
     echo "Usage: [environment] $REPO_NAME installer.sh [install|uninstall|update]"
-    echo "Environment:"
-    echo "   COMMAND_PATH_PREFIX=$COMMAND_PATH_PREFIX"
-    echo "   INSTALL_PATH=$INSTALL_PATH"
 }
 
 # 安装 git-toolkit
@@ -72,14 +88,14 @@ function update() {
 
 # clone项目
 function clone() {
-    if [ -d "$INSTALL_PATH" -a -d "$INSTALL_PATH/.git" ] ; then
+    if [ -d "$INSTALL_PATH" ] && [ -d "$INSTALL_PATH/.git" ] ; then
         echo "Using existing repo: $REPO_NAME"
-        cd $INSTALL_PATH
+        cd $INSTALL_PATH || exit 1
         git pull
-        cd -
+        cd -  ||  exit 1
     else
         echo "Cloning repo from GitHub to $INSTALL_PATH"
-        git clone "$REPO_HOME" "$INSTALL_PATH"
+        git clone "$REPO_HOME" "$INSTALL_PATH" || exit 1
         chmod -R 755 "$INSTALL_PATH/$COMMAND"
         chmod -R 755 "$INSTALL_PATH/$HOOKS"
     fi
@@ -90,10 +106,10 @@ function install_cmd() {
     echo "Install Git Command......"
     mkdir -p $COMMAND_PATH_PREFIX
     for script_file in $SCRIPT_FILES ; do
-        ln -s "$INSTALL_PATH/$COMMAND/$script_file" "$COMMAND_PATH_PREFIX/$script_file"
+        ln -s "$INSTALL_PATH/$COMMAND/$script_file" "$COMMAND_PATH_PREFIX/$script_file" > /dev/null 2>&1 || echo "$COMMAND_PATH_PREFIX/$script_file installed."
     done
 
-    ln -s "$INSTALL_PATH/installer.sh" "$COMMAND_PATH_PREFIX/$REPO_NAME"
+    ln -s "$INSTALL_PATH/installer.sh" "$COMMAND_PATH_PREFIX/$REPO_NAME" > /dev/null 2>&1 || echo "$COMMAND_PATH_PREFIX/$REPO_NAME installed."
 }
 # 安装配置
 function install_config() {
