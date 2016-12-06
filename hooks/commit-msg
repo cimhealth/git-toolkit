@@ -47,8 +47,8 @@ while IFS= read -r line || [[ -n "$line" ]]; do
             error "subject line followed by non-empty line\n $line"
 
     else
-        [[ $length -gt 72 ]] &&
-            error "line $line_num exceeds 72 characters\n $line"
+        [[ $length -gt 200 ]] &&
+            error "line $line_num exceeds 200 characters\n $line"
     fi
 done < "$1"
 
