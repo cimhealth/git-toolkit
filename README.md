@@ -8,13 +8,13 @@
 **使用curl**
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/cimhealth/git-toolkit/master/installer.sh)"
 ```
 
 **使用wget**
 
 ```bash
-bash -c "$(wget https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh -O -)"
+bash -c "$(wget https://raw.githubusercontent.com/cimhealth/git-toolkit/master/installer.sh -O -)"
 ```
 
 ## git toolkit介绍
