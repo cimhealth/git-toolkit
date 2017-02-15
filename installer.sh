@@ -32,7 +32,7 @@ function init() {
         fi
         PATH_NUM=$(($PATH_NUM+1))
     done
-    if [[ $PATH_NUM =~ ^[0-${#COMAND_PATHS[@]-1}] ]]; then
+    if [[ $PATH_NUM =~ ^[0-$(expr ${#COMAND_PATHS[@]} - 1)] ]]; then
         INSTALL_PATH=${INSTALL_PATHS[PATH_NUM]}
     fi
 
@@ -127,7 +127,7 @@ function install_hooks() {
     git config --global core.hooksPath "$INSTALL_PATH/$HOOKS"
 }
 
-init
+uname -a|egrep -i linux &&  { [ `id -u` -eq 0 ] && init || echo "Please  sudo  bash installer.sh " && exit 0 ; } || init
 echo "### $REPO_NAME no-make installer ###"
 case $1 in
     uninstall)
