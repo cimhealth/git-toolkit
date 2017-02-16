@@ -21,6 +21,7 @@ function init() {
     COMAND_PATHS=("/usr/local/bin" "$USER_HOME/bin")
     INSTALL_PATHS=("/usr/local/$REPO_NAME" "$USER_HOME/.$REPO_NAME")
     PATH_NUM=0
+    uname -a|egrep -i linux && { echo $PATH|egrep /usr/local/sbin || PATH=$PATH:/usr/local/sbin ; }
     for p in "${COMAND_PATHS[@]}" ; do
         if [[ "$(echo $PATH | grep "${p}")" ]]; then
             touch "$p/git-toolkit-temp" > /dev/null 2>&1
