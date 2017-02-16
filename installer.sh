@@ -128,7 +128,7 @@ function install_hooks() {
     git config --global core.hooksPath "$INSTALL_PATH/$HOOKS"
 }
 
-uname -a|egrep -i linux &&  { [ `id -u` -eq 0 ] && init || echo "Please  sudo  bash installer.sh " && exit 0 ; } || init
+uname -a|egrep -i linux &&  { [ `id -u` -eq 0 ] && init || { echo "Please  sudo  bash installer.sh " && exit 0 ; } ; } || init
 echo "### $REPO_NAME no-make installer ###"
 case $1 in
     uninstall)
