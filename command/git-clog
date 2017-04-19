@@ -7,11 +7,38 @@
 REMOTE_URL=""
 # 项目已有tag数组，如果存在，则以git tag输出的倒序存在
 TAGS=()
+AUTHORS=()
+
+VERSION_PARAMETERS=""
 
 function init() {
-    # get_remote_url "https://github.com/tonydeng/git-toolkit.git"
+    verify_param "$@"
     get_all_tag
     get_remote_url ""
+    get_all_author "$VERSION_PARAMETERS"
+}
+
+#####
+# 验证命令参数
+#####
+function verify_param() {
+    PARAM=("$@")
+    i=0
+    for p in "${PARAM[@]}"; do
+        case $p in
+            "-v"|"--vesion" )
+                echo "$p ${PARAM[$i+1]}"
+                if [[ -n "${PARAM[$i+1]}" ]]; then
+                    CMD_PARAMETERS=$VERSION_PARAMETERS" --grep '(${PARAM[$i+1]})'"
+                fi
+                ;;
+            "-o"|"--output" )
+                    echo "$p ${PARAM[$i+1]}"
+                    CMD_PARAMETERS=$CMD_PARAMETERS" > ${PARAM[$i+1]}"
+                ;;
+        esac
+        let i++
+    done
 }
 
 #####
@@ -37,18 +64,34 @@ function get_all_tag() {
     i=0
     for tag in  `git tag -l |sort -nr`; do
         TAGS[$i]=（$tag）
-        let i=$i+1
+        let i++
     done
 }
-#####
-# 输出日志
-#####
-function log() {
+
+function get_all_author() {
     # 获得所有提交者
     # git shortlog -s -n --all -e --no-merges --grep '(1.2)'
+    CMD="git shortlog -s -n --all -e --no-merges"
+    if [[ -n "$1" ]]; then
+        CMD="$CMD$1"
+    fi
+    authors=$(eval $CMD)
+    for author in "${authors[@]}"; do
+        # {a[NR]=$0}END{for (i=1;i<=NR;i++) if (a[i]~/keyword/) for (j=i-3;j<i;j++) print a[j]}
+        echo "$author"|awk -F ' ' '{ for (i=2;i<NF;i++) {a=a" "$i} $a $NF" ("$1")"}'
+        # echo "$author" | awk -F ' ' '{a[NR]=$0}END{for (i=2;i<=NR;i++) print a[i]}'
+        # git for-each-ref --sort=taggerdate --format '%(tag)_,,,_%(taggerdate:raw)_,,,_%(taggername)_,,,_%(subject)' refs/tags | awk 'BEGIN { FS = "_,,,_"  } ; { t=strftime("%Y-%m-%d  %H:%M",$2); printf "%-20s %-18s %-25s %s\n", t, $1, $4, $3  }'
+    done
+    # CMD="$CMD | awk -F ' ' '{print $2''$1}'"
+    # echo "$CMD"
+    # eval "$CMD"
+}
+#####
+# 直接输出日志到在终端
+#####
+function simple_log() {
     LOG_CMD="git shortlog -e --no-merges --pretty=format:'%s [view commit %h](${REMOTE_URL[*]}/commit/%H)'"
-    # echo "$LOG_CMD"
-    eval $LOG_CMD
+    # eval $LOG_CMD
 }
 #####
 # 使用帮助
@@ -77,15 +120,12 @@ OPTIONS
 EOF
 }
 case $1 in
-    -h)
-        help
-        ;;
-    --help)
+    "-h" | "--help")
         help
         ;;
     * )
-        init
-        log
+        init "$@"
+        # simple_log
         exit
         ;;
 esac
