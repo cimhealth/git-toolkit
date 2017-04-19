@@ -1,0 +1,91 @@
+#!/bin/bash
+#####
+# Git Customization Changle Log Output
+#####
+
+#  远程仓库地址变量
+REMOTE_URL=""
+# 项目已有tag数组，如果存在，则以git tag输出的倒序存在
+TAGS=()
+
+function init() {
+    # get_remote_url "https://github.com/tonydeng/git-toolkit.git"
+    get_all_tag
+    get_remote_url ""
+}
+
+#####
+# 获取远程仓库地址
+#####
+function get_remote_url() {
+    if [[ -n "$1" ]]; then
+        ORIGIN="$1"
+    else
+        ORIGIN=`git remote get-url origin`
+    fi
+    if [[ "$ORIGIN" == "https"* ]]; then
+        REMOTE_URL="${ORIGIN%.*}"
+    else
+        REMOTE_URL=(`echo "$ORIGIN"|awk -F '[@:]' '{print "https://"$2"/"$3}'`)
+        REMOTE_URL=("${REMOTE_URL%.*}")
+    fi
+}
+#####
+# 获取当前所有tag
+#####
+function get_all_tag() {
+    i=0
+    for tag in  `git tag -l |sort -nr`; do
+        TAGS[$i]=（$tag）
+        let i=$i+1
+    done
+}
+#####
+# 输出日志
+#####
+function log() {
+    # 获得所有提交者
+    # git shortlog -s -n --all -e --no-merges --grep '(1.2)'
+    LOG_CMD="git shortlog -e --no-merges --pretty=format:'%s [view commit %h](${REMOTE_URL[*]}/commit/%H)'"
+    # echo "$LOG_CMD"
+    eval $LOG_CMD
+}
+#####
+# 使用帮助
+#####
+function help() {
+cat <<  EOF
+GIT-CLOG(1)
+
+NAME
+       git-clog - Git Change Logs Output
+
+SYNOPSIS
+       git clog [<options>] [<revision range>] [[--] <path>...]
+
+DESCRIPTION
+       Summarizes git log output in a format suitable for inclusion in release announcements. Each commit will be grouped by author and title.
+
+OPTIONS
+       -o, --output
+           The changelog output to a file.
+
+       -v, --version
+           Specify the output one version.
+       -h, --help
+           Prints the synopsis and a list of the most commonly used commands.
+EOF
+}
+case $1 in
+    -h)
+        help
+        ;;
+    --help)
+        help
+        ;;
+    * )
+        init
+        log
+        exit
+        ;;
+esac
