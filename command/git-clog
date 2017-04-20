@@ -3,10 +3,16 @@
 # Git Customization Changle Log Output
 #####
 
+BASEDIR=$(dirname $0)
+export PATH=$BASEDIR/module:$PATH
+
+. array-utils
+
 #  远程仓库地址变量
 REMOTE_URL=""
 # 项目已有tag数组，如果存在，则以git tag输出的倒序存在
-TAGS=()
+# TAGS=()
+declare -a TAGS
 AUTHORS=()
 
 VERSION_PARAMETERS=""
@@ -62,10 +68,17 @@ function get_remote_url() {
 #####
 function get_all_tag() {
     i=0
-    for tag in  `git tag -l |sort -nr`; do
-        TAGS[$i]=（$tag）
+    for tag in  `git tag -l --sort="version:refname"`; do
+        tags[$i]="$tag"
         let i++
     done
+
+    TAGS=(`array_sort_desc "${tags[*]}"`)
+
+    for tag in "${TAGS[@]}"; do
+        echo "$tag"
+    done
+    # echo "TAGS length ${#TAGS[*]}"
 }
 
 function get_all_author() {
@@ -76,12 +89,12 @@ function get_all_author() {
         CMD="$CMD$1"
     fi
     authors=$(eval $CMD)
-    for author in "${authors[@]}"; do
+    # for author in "${authors[@]}"; do
         # {a[NR]=$0}END{for (i=1;i<=NR;i++) if (a[i]~/keyword/) for (j=i-3;j<i;j++) print a[j]}
-        echo "$author"|awk -F ' ' '{ for (i=2;i<NF;i++) {a=a" "$i} $a $NF" ("$1")"}'
+        # echo "$author"|awk -F ' ' '{ for (i=2;i<NF;i++) {a=a" "$i} $a $NF" ("$1")"}'
         # echo "$author" | awk -F ' ' '{a[NR]=$0}END{for (i=2;i<=NR;i++) print a[i]}'
         # git for-each-ref --sort=taggerdate --format '%(tag)_,,,_%(taggerdate:raw)_,,,_%(taggername)_,,,_%(subject)' refs/tags | awk 'BEGIN { FS = "_,,,_"  } ; { t=strftime("%Y-%m-%d  %H:%M",$2); printf "%-20s %-18s %-25s %s\n", t, $1, $4, $3  }'
-    done
+    # done
     # CMD="$CMD | awk -F ' ' '{print $2''$1}'"
     # echo "$CMD"
     # eval "$CMD"
