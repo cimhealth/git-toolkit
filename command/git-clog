@@ -11,18 +11,22 @@ export PATH=$BASEDIR/module:$PATH
 #  远程仓库地址变量
 REMOTE_URL=""
 # 项目已有tag数组，如果存在，则以git tag输出的倒序存在
-# TAGS=()
 declare -a TAGS
-AUTHORS=()
+# clog命令参数传入的版本信息
+declare -a CURRENT_TAG
+# clog命令参数传入的上一个版本信息
+declare -a BEFORE_TAG
+# 当前命令执行的所有代码作者信息
+declare -a AUTHORS
 
-VERSION_PARAMETERS=""
+VERSION_PARAMETERS=''
 
 function init() {
     verify_version
-    verify_param "$@"
     get_all_tag
-    get_remote_url ""
-    get_all_author "$VERSION_PARAMETERS"
+    verify_param "$@"
+    get_remote_url
+    get_all_author
 }
 #####
 # 验证当前git的版本是否大于2.1
@@ -45,8 +49,11 @@ function verify_param() {
         case $p in
             "-v"|"--vesion" )
                 if [[ -n "${PARAM[$i+1]}" ]]; then
-                    CMD_PARAMETERS=$VERSION_PARAMETERS" --grep '(${PARAM[$i+1]})'"
-                    echo "$CMD_PARAMETERS"
+                    CURRENT_TAG=(`get_tag "${PARAM[$i+1]}"`)
+                    _index="${CURRENT_TAG[0]}"
+                    let _index++
+                    BEFORE_TAG=(`get_tag ${TAGS[$_index]}`)
+                    VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
                 fi
                 ;;
             "-o"|"--output" )
@@ -79,30 +86,53 @@ function get_remote_url() {
 #####
 function get_all_tag() {
     i=0
-    for tag in  `git tag -l --sort="version:refname"`; do
+    # git for-each-ref --sort="version:refname" --format='%(objectname) %(refname:short)' refs/tags/
+    # git tag -l --sort="version:refname"
+    for tag in  `git for-each-ref --sort="version:refname" --format='%(objectname)|%(refname:short)' refs/tags/`; do
         tags[$i]="$tag"
         let i++
     done
-
     TAGS=(`array_sort_desc "${tags[*]}"`)
     unset tags
     unset i
     unset tag
 }
-
-function get_all_author() {
-    # 获得所有提交者
-    # git shortlog -s -n --all -e --no-merges --grep '(1.2)'
-    CMD="git shortlog -s -n --all -e --no-merges"
-    if [[ -n "$1" ]]; then
-        echo "$1"
-        CMD="$CMD$1"
+#####
+# 获取某个tag信息
+#####
+function get_tag() {
+    _t="$1"
+    # 判断输入的版本信息是否包含项目名
+    if [[ $(echo "$1"|grep "-") != "" ]]; then
+        _t=`echo $1|awk -F '-' '{print $2}'`
     fi
-    echo "$CMD"
-    authors=$(eval $CMD)
-    for author in "${authors[*]}"; do
-        get_author "$author"
+    for (( i=0; i<${#TAGS[*]};i++)); do
+        if [[ "$_t" == "`echo ${TAGS[$i]}|awk -F '[|-]' '{print $3}'`" ]]; then
+            tag[0]="$i"
+            tag[1]=`echo ${TAGS[$i]}|awk -F '|' '{print $1}'`
+            tag[2]=`echo ${TAGS[$i]}|awk -F '|' '{print $2}'`
+            tag[3]=`echo ${TAGS[$i]}|awk -F '[|-]' '{print $3}'`
+        fi
     done
+    echo "${tag[*]}"
+}
+#####
+# 获得所有提交者
+#####
+function get_all_author() {
+    # git shortlog -s -n -e --no-merges 85e76af9..3637d2b8
+    _cmd="git shortlog -s -n -e --no-merges $VERSION_PARAMETERS"
+    # if [[ -n "$1" ]]; then
+    #     CMD="$CMD$1"
+    # fi
+    _authors=$(eval $_cmd)
+    i=0
+    for author in "${_authors[@]}"; do
+        AUTHORS[$i]=`get_author "$author"`
+        let i++
+    done
+    unset _authors
+    unset _cmd
 }
 ###
 # 将“751	Tony Deng <wolf.deng@gmail.com>” 这样的格式改成 "Tony Deng <wolf.deng@gmail.com> (751)"
@@ -114,8 +144,8 @@ function get_author() {
 # 直接输出日志到在终端
 #####
 function simple_log() {
-    LOG_CMD="git shortlog -e --no-merges --pretty=format:'%s [view commit %h](${REMOTE_URL[*]}/commit/%H)'"
-    # eval $LOG_CMD
+    _cmd="git shortlog -e --no-merges $VERSION_PARAMETERS  --pretty=format:'%s (%cr) [view commit %h](${REMOTE_URL[*]}/commit/%H)' > CHANGELOG.md"
+    eval $_cmd
 }
 #####
 # 使用帮助
@@ -149,7 +179,7 @@ case $1 in
         ;;
     * )
         init "$@"
-        # simple_log
+        simple_log
         exit
         ;;
 esac
