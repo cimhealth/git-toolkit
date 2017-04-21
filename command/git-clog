@@ -18,12 +18,23 @@ AUTHORS=()
 VERSION_PARAMETERS=""
 
 function init() {
+    verify_version
     verify_param "$@"
     get_all_tag
     get_remote_url ""
     get_all_author "$VERSION_PARAMETERS"
 }
-
+#####
+# 验证当前git的版本是否大于2.1
+#####
+function verify_version() {
+    version=(`git --version|awk -F ' ' '{print $3}'|cut -d '.' -f1 -f2`)
+    t=`expr "$version" \>= '2.1'`
+    if [[ "$t" -eq "0" ]]; then
+        echo "The current Git version is less than 2.1, please upgrade to Git - 2.1 above"
+        exit 1
+    fi
+}
 #####
 # 验证命令参数
 #####
@@ -33,9 +44,9 @@ function verify_param() {
     for p in "${PARAM[@]}"; do
         case $p in
             "-v"|"--vesion" )
-                echo "$p ${PARAM[$i+1]}"
                 if [[ -n "${PARAM[$i+1]}" ]]; then
                     CMD_PARAMETERS=$VERSION_PARAMETERS" --grep '(${PARAM[$i+1]})'"
+                    echo "$CMD_PARAMETERS"
                 fi
                 ;;
             "-o"|"--output" )
@@ -74,11 +85,9 @@ function get_all_tag() {
     done
 
     TAGS=(`array_sort_desc "${tags[*]}"`)
-
-    for tag in "${TAGS[@]}"; do
-        echo "$tag"
-    done
-    # echo "TAGS length ${#TAGS[*]}"
+    unset tags
+    unset i
+    unset tag
 }
 
 function get_all_author() {
@@ -86,18 +95,20 @@ function get_all_author() {
     # git shortlog -s -n --all -e --no-merges --grep '(1.2)'
     CMD="git shortlog -s -n --all -e --no-merges"
     if [[ -n "$1" ]]; then
+        echo "$1"
         CMD="$CMD$1"
     fi
+    echo "$CMD"
     authors=$(eval $CMD)
-    # for author in "${authors[@]}"; do
-        # {a[NR]=$0}END{for (i=1;i<=NR;i++) if (a[i]~/keyword/) for (j=i-3;j<i;j++) print a[j]}
-        # echo "$author"|awk -F ' ' '{ for (i=2;i<NF;i++) {a=a" "$i} $a $NF" ("$1")"}'
-        # echo "$author" | awk -F ' ' '{a[NR]=$0}END{for (i=2;i<=NR;i++) print a[i]}'
-        # git for-each-ref --sort=taggerdate --format '%(tag)_,,,_%(taggerdate:raw)_,,,_%(taggername)_,,,_%(subject)' refs/tags | awk 'BEGIN { FS = "_,,,_"  } ; { t=strftime("%Y-%m-%d  %H:%M",$2); printf "%-20s %-18s %-25s %s\n", t, $1, $4, $3  }'
-    # done
-    # CMD="$CMD | awk -F ' ' '{print $2''$1}'"
-    # echo "$CMD"
-    # eval "$CMD"
+    for author in "${authors[*]}"; do
+        get_author "$author"
+    done
+}
+###
+# 将“751	Tony Deng <wolf.deng@gmail.com>” 这样的格式改成 "Tony Deng <wolf.deng@gmail.com> (751)"
+###
+function get_author() {
+    echo "$author"|awk '{for(i=2;i<=NF;i++)printf $i""FS;print "("$1")"}'
 }
 #####
 # 直接输出日志到在终端
