@@ -52,13 +52,18 @@ function verify_param() {
                     CURRENT_TAG=(`get_tag "${PARAM[$i+1]}"`)
                     _index="${CURRENT_TAG[0]}"
                     let _index++
-                    BEFORE_TAG=(`get_tag ${TAGS[$_index]}`)
-                    VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
+                    if [[ $_index < ${#TAGS[*]} ]]; then
+                        BEFORE_TAG=(`get_tag ${TAGS[$_index]}`)
+                        VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
+                    else
+                        VERSION_PARAMETERS="${CURRENT_TAG[1]}"
+                    fi
+                    # VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
                 fi
                 ;;
             "-o"|"--output" )
                     echo "$p ${PARAM[$i+1]}"
-                    CMD_PARAMETERS=$CMD_PARAMETERS" > ${PARAM[$i+1]}"
+                    CMD_PARAMETERS=$CMD_PARAMETERS" >> ${PARAM[$i+1]}"
                 ;;
         esac
         let i++
@@ -86,7 +91,6 @@ function get_remote_url() {
 #####
 function get_all_tag() {
     i=0
-    # git for-each-ref --sort="version:refname" --format='%(objectname) %(refname:short)' refs/tags/
     # git tag -l --sort="version:refname"
     for tag in  `git for-each-ref --sort="version:refname" --format='%(objectname)|%(refname:short)' refs/tags/`; do
         tags[$i]="$tag"
@@ -103,7 +107,8 @@ function get_all_tag() {
 function get_tag() {
     _t="$1"
     # 判断输入的版本信息是否包含项目名
-    if [[ $(echo "$1"|grep "-") != "" ]]; then
+    # if [[ $(echo "$1"|grep "-") != "" ]]; then
+    if [[ "$1" == *"-"* ]]; then
         _t=`echo $1|awk -F '-' '{print $2}'`
     fi
     for (( i=0; i<${#TAGS[*]};i++)); do
@@ -121,31 +126,39 @@ function get_tag() {
 #####
 function get_all_author() {
     # git shortlog -s -n -e --no-merges 85e76af9..3637d2b8
-    _cmd="git shortlog -s -n -e --no-merges $VERSION_PARAMETERS"
-    # if [[ -n "$1" ]]; then
-    #     CMD="$CMD$1"
-    # fi
-    _authors=$(eval $_cmd)
-    i=0
-    for author in "${_authors[@]}"; do
-        AUTHORS[$i]=`get_author "$author"`
-        let i++
-    done
-    unset _authors
-    unset _cmd
+    _index=0
+    while read _line; do
+        AUTHORS[$_index]="`get_author "$_line"`"
+        let _index++
+    done<<EOF
+`git shortlog -s -n -e --no-merges $VERSION_PARAMETERS`
+EOF
 }
 ###
 # 将“751	Tony Deng <wolf.deng@gmail.com>” 这样的格式改成 "Tony Deng <wolf.deng@gmail.com> (751)"
 ###
 function get_author() {
-    echo "$author"|awk '{for(i=2;i<=NF;i++)printf $i""FS;print "("$1")"}'
+    echo "$1"|awk '{for(i=2;i<=NF;i++)printf $i""FS;print "("$1")"}'
 }
 #####
 # 直接输出日志到在终端
 #####
 function simple_log() {
-    _cmd="git shortlog -e --no-merges $VERSION_PARAMETERS  --pretty=format:'%s (%cr) [view commit %h](${REMOTE_URL[*]}/commit/%H)' > CHANGELOG.md"
-    eval $_cmd
+    for a in "${AUTHORS[@]}"; do
+        _author=`echo "$a"|awk -F '[<\>]' '{print $2}'`
+        echo "## $a"
+        echo ""
+        _cmd="git log --author='${_author}' --no-merges $VERSION_PARAMETERS --pretty=format:'%s (%cr) [view commit %h](${REMOTE_URL[*]}/commit/%h)'"
+        if [[ -n "$CMD_PARAMETERS" ]]; then
+            _cmd="$_cmd $CMD_PARAMETERS"
+        fi
+        echo $"$_cmd"
+        # eval "$_cmd"
+        echo ""
+        echo ""
+        unset _author
+        unset _cmd
+    done
 }
 #####
 # 使用帮助
