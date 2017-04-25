@@ -52,16 +52,6 @@ function verify_param() {
         case $p in
             "-v"|"--vesion" )
                 if [[ -n "${PARAM[$i+1]}" ]]; then
-                    # CURRENT_TAG=(`get_tag "${PARAM[$i+1]}"`)
-                    # _index="${CURRENT_TAG[0]}"
-                    # let _index++
-                    # if [[ $_index < ${#TAGS[*]} ]]; then
-                    #     BEFORE_TAG=(`get_tag ${TAGS[$_index]}`)
-                    #     VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
-                    # else
-                    #     VERSION_PARAMETERS="${CURRENT_TAG[1]}"
-                    # fi
-                    # VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
                     _CURRENT_TAG=${PARAM[$i+1]}
                     # set_tag "${PARAM[$i+1]}"
                 fi
@@ -115,20 +105,30 @@ function get_tag() {
     # 判断输入的版本信息是否包含项目名
     # if [[ $(echo "$1"|grep "-") != "" ]]; then
     if [[ "$1" == *"-"* ]]; then
-        _t=`echo $1|awk -F '-' '{print $2}'`
+        # _t=`echo $1|awk -F '-' '{print $2}'`
+        _t=${_t##*-}
     fi
     for (( i=0; i<${#TAGS[*]};i++)); do
-        if [[ "$_t" == "`echo ${TAGS[$i]}|awk -F '[|-]' '{print $3}'`" ]]; then
+        # echo "$_t ${TAGS[$i]} ${TAGS[$i]##*-}"
+        # if [[ "$_t" == "`echo ${TAGS[$i]}|awk -F '[|-]' '{print $3}'`" ]]; then
+        if [[ "$_t" == "${TAGS[$i]##*-}" ]]; then
             tag[0]="$i"
-            tag[1]=`echo ${TAGS[$i]}|awk -F '|' '{print $1}'`
-            tag[2]=`echo ${TAGS[$i]}|awk -F '|' '{print $2}'`
-            tag[3]=`echo ${TAGS[$i]}|awk -F '[|-]' '{print $3}'`
+            tag[1]="${TAGS[$i]%|*}" # tag commit_id_sha1
+            tag[2]="${TAGS[$i]#*|}" # tag project_version
+            tag[3]="${TAGS[$i]##*-}" # tag version
+            # tag[1]=`echo ${TAGS[$i]}|awk -F '|' '{print $1}'`
+            # tag[2]=`echo ${TAGS[$i]}|awk -F '|' '{print $2}'`
+            # tag[3]=`echo ${TAGS[$i]}|awk -F '[|-]' '{print $3}'`
         fi
     done
     echo "${tag[*]}"
 }
 
 function set_tag() {
+    # for (( i = 0; i < ${#TAGS[@]}; i++ )); do
+    #     echo ${TAGS[$i]}
+    # done
+    # get_tag "$1"
     CURRENT_TAG=(`get_tag "$1"`)
     _index="${CURRENT_TAG[0]}"
     let _index++
