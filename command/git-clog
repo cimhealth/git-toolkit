@@ -8,6 +8,9 @@ export PATH=$BASEDIR/module:$PATH
 
 . array-utils
 
+_CURRENT_TAG=""
+_OUTPUT=""
+
 #  远程仓库地址变量
 REMOTE_URL=""
 # 项目已有tag数组，如果存在，则以git tag输出的倒序存在
@@ -26,7 +29,7 @@ function init() {
     get_all_tag
     verify_param "$@"
     get_remote_url
-    get_all_author
+    all_log
 }
 #####
 # 验证当前git的版本是否大于2.1
@@ -49,21 +52,24 @@ function verify_param() {
         case $p in
             "-v"|"--vesion" )
                 if [[ -n "${PARAM[$i+1]}" ]]; then
-                    CURRENT_TAG=(`get_tag "${PARAM[$i+1]}"`)
-                    _index="${CURRENT_TAG[0]}"
-                    let _index++
-                    if [[ $_index < ${#TAGS[*]} ]]; then
-                        BEFORE_TAG=(`get_tag ${TAGS[$_index]}`)
-                        VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
-                    else
-                        VERSION_PARAMETERS="${CURRENT_TAG[1]}"
-                    fi
+                    # CURRENT_TAG=(`get_tag "${PARAM[$i+1]}"`)
+                    # _index="${CURRENT_TAG[0]}"
+                    # let _index++
+                    # if [[ $_index < ${#TAGS[*]} ]]; then
+                    #     BEFORE_TAG=(`get_tag ${TAGS[$_index]}`)
+                    #     VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
+                    # else
+                    #     VERSION_PARAMETERS="${CURRENT_TAG[1]}"
+                    # fi
                     # VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
+                    _CURRENT_TAG=${PARAM[$i+1]}
+                    # set_tag "${PARAM[$i+1]}"
                 fi
                 ;;
             "-o"|"--output" )
-                    echo "$p ${PARAM[$i+1]}"
-                    CMD_PARAMETERS=$CMD_PARAMETERS" >> ${PARAM[$i+1]}"
+                if [[ -n "${PARAM[$i+1]}" ]]; then
+                    _OUTPUT="${PARAM[$i+1]}"
+                fi
                 ;;
         esac
         let i++
@@ -121,6 +127,19 @@ function get_tag() {
     done
     echo "${tag[*]}"
 }
+
+function set_tag() {
+    CURRENT_TAG=(`get_tag "$1"`)
+    _index="${CURRENT_TAG[0]}"
+    let _index++
+    if [[ $_index < ${#TAGS[*]} ]]; then
+        BEFORE_TAG=(`get_tag ${TAGS[$_index]}`)
+        VERSION_PARAMETERS="${BEFORE_TAG[1]}..${CURRENT_TAG[1]}"
+    else
+        VERSION_PARAMETERS="${CURRENT_TAG[1]}"
+        unset BEFORE_TAG
+    fi
+}
 #####
 # 获得所有提交者
 #####
@@ -140,22 +159,59 @@ EOF
 function get_author() {
     echo "$1"|awk '{for(i=2;i<=NF;i++)printf $i""FS;print "("$1")"}'
 }
+###
+# 输出所有日志
+###
+function all_log() {
+    if [[ -n "$_CURRENT_TAG" ]]; then
+        set_tag "$_CURRENT_TAG"
+        get_all_author
+        simple_log
+        unset AUTHORS
+    else
+        for tag in "${TAGS[@]}"; do
+            set_tag "$tag"
+            get_all_author
+            simple_log
+            unset AUTHORS
+        done
+    fi
+
+}
 #####
 # 直接输出日志到在终端
 #####
 function simple_log() {
+    if [[ -n "$_OUTPUT" ]]; then
+        echo "# ${CURRENT_TAG[2]}" >> "$_OUTPUT"
+        echo "" >> "$_OUTPUT"
+        echo "" >> "$_OUTPUT"
+    else
+        echo "# ${CURRENT_TAG[2]}"
+        echo ""
+        echo ""
+    fi
+
     for a in "${AUTHORS[@]}"; do
         _author=`echo "$a"|awk -F '[<\>]' '{print $2}'`
-        echo "## $a"
-        echo ""
-        _cmd="git log --author='${_author}' --no-merges $VERSION_PARAMETERS --pretty=format:'%s (%cr) [view commit %h](${REMOTE_URL[*]}/commit/%h)'"
-        if [[ -n "$CMD_PARAMETERS" ]]; then
-            _cmd="$_cmd $CMD_PARAMETERS"
+        _author_output=`echo "$a"|awk -F '[<\>]' '{print "["$1"]("$2")"$3}'`
+        _cmd="git log --author='${_author}' --no-merges $VERSION_PARAMETERS --pretty=format:'* %s (%ad) [view commit %h](${REMOTE_URL[*]}/commit/%h)  ' --date=format:'%Y-%m-%d %H:%M:%S'"
+        if [[ -n "$_OUTPUT" ]]; then
+            echo "#### $_author_output" >> "$_OUTPUT"
+            echo "" >> "$_OUTPUT"
+            _cmd="$_cmd >> $_OUTPUT"
+            # echo $"$_cmd"
+            eval "$_cmd"
+            echo "" >> "$_OUTPUT"
+            echo "" >> "$_OUTPUT"
+        else
+            echo "#### $_author_output"
+            echo ""
+            # echo $"$_cmd"
+            eval "$_cmd"
+            echo ""
+            echo ""
         fi
-        echo $"$_cmd"
-        # eval "$_cmd"
-        echo ""
-        echo ""
         unset _author
         unset _cmd
     done
@@ -179,7 +235,6 @@ DESCRIPTION
 OPTIONS
        -o, --output
            The changelog output to a file.
-
        -v, --version
            Specify the output one version.
        -h, --help
@@ -192,7 +247,7 @@ case $1 in
         ;;
     * )
         init "$@"
-        simple_log
+        # simple_log
         exit
         ;;
 esac
