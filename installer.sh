@@ -5,7 +5,7 @@ function init() {
     CONFIG="config"
     HOOKS="hooks"
 
-    SCRIPT_FILES="git-ci"
+    SCRIPT_FILES=("git-ci" "git-clog")
     TEMPLATE_FILES="git-message-template"
 
     USER_HOME="$(env|grep ^HOME=|cut -c 6-)"
@@ -53,7 +53,7 @@ function uninstall() {
 
     if [ -d "$COMMAND_PATH_PREFIX" ] ; then
         echo "Uninstalling $REPO_NAME command from $COMMAND_PATH_PREFIX"
-        for script_file in $SCRIPT_FILES ; do
+        for script_file in "${SCRIPT_FILES[@]}" ; do
             echo "rm -vf $COMMAND_PATH_PREFIX/$script_file"
             rm -vf "$COMMAND_PATH_PREFIX/$script_file"
         done
@@ -106,7 +106,7 @@ function clone() {
 function install_cmd() {
     echo "Install Git Command......"
     mkdir -p $COMMAND_PATH_PREFIX
-    for script_file in $SCRIPT_FILES ; do
+    for script_file in "${SCRIPT_FILES[@]}" ; do
         ln -s "$INSTALL_PATH/$COMMAND/$script_file" "$COMMAND_PATH_PREFIX/$script_file" > /dev/null 2>&1 || echo "$COMMAND_PATH_PREFIX/$script_file installed."
     done
 

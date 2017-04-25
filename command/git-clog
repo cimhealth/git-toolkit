@@ -3,11 +3,6 @@
 # Git Customization Changle Log Output
 #####
 
-BASEDIR=$(dirname $0)
-export PATH=$BASEDIR/module:$PATH
-
-. array-utils
-
 # clog命令传入的version参数
 _CURRENT_TAG=""
 # clog命令传入的output参数
@@ -90,6 +85,16 @@ function get_remote_url() {
     fi
 }
 #####
+# 数组倒序排列
+#####
+function _array_sort_desc() {
+    arr=($@)
+    for (( i=0, j=${#arr[*]} ; j>=0;i++,j-- )); do
+        newarray[$i]=${arr[$j]};
+    done;
+    echo "${newarray[*]}"
+}
+#####
 # 获取当前所有tag
 #####
 function get_all_tag() {
@@ -99,7 +104,7 @@ function get_all_tag() {
         tags[$i]="$tag"
         let i++
     done
-    TAGS=(`array_sort_desc "${tags[*]}"`)
+    TAGS=(`_array_sort_desc "${tags[*]}"`)
     unset tags
     unset i
     unset tag
