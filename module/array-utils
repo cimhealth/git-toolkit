@@ -1,7 +1,0 @@
-#!/bin/bash
-
-function array_sort_desc() {
-    echo "process array sort desc"
-
-
-}
