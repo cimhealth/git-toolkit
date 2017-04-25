@@ -65,6 +65,25 @@ git ci
         0. quit: 退出
 ```    
 
+#### git clog
+
+提供项目的`CHANGELOG`输出，支持输出到终端或指定文件中，可以使用`git clog -h`来查看帮助信息。
+
+输出的格式大致如下，符合`Markdown`语法：
+
+```
+# tag
+
+#### [author](mailto:email) (commit_count)
+
+* commit message (commit date) [commit_short_sha1](commit_url)
+* commit message (commit date) [commit_short_sha1](commit_url)
+```
+
+显示效果如下：
+
+![git-toolkit changelog](http://i1.piimg.com/567571/0ac12a53247a0fec.jpg)
+
 ### Hook脚本
 
 #### commit-msg
