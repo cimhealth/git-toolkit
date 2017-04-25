@@ -1,0 +1,15 @@
+#!/bin/bash
+#####
+# 数组相关函数
+#####
+
+#####
+# 数组倒序排列
+#####
+function array_sort_desc() {
+    arr=($@)
+    for (( i=0, j=${#arr[*]} ; j>=0;i++,j-- )); do
+        newarray[$i]=${arr[$j]};
+    done;
+    echo "${newarray[*]}"
+}
