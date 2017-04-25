@@ -8,23 +8,30 @@ export PATH=$BASEDIR/module:$PATH
 
 . array-utils
 
+# clog命令传入的version参数
 _CURRENT_TAG=""
+# clog命令传入的output参数
 _OUTPUT=""
 
 #  远程仓库地址变量
 REMOTE_URL=""
 # 项目已有tag数组，如果存在，则以git tag输出的倒序存在
+# 数组中的值为<commit_id_sha1>|<project-version>
 declare -a TAGS
-# clog命令参数传入的版本信息
+# 当前tag信息(<index> <commit_id_sha1> <project-version> <version>)
 declare -a CURRENT_TAG
-# clog命令参数传入的上一个版本信息
+# 上一个tag信息(<index> <commit_id_sha1> <project-version> <version>)
 declare -a BEFORE_TAG
-# 当前命令执行的所有代码作者信息
+# 当前命令执行的所有代码作者信息 (author <author_email> (commit_count))
+# 例如：Tony Deng <wolf.deng@gmail.com> (1)
 declare -a AUTHORS
 
 VERSION_PARAMETERS=''
 
-function init() {
+####
+# changelog main方法
+####
+function main() {
     verify_version
     get_all_tag
     verify_param "$@"
@@ -124,6 +131,9 @@ function get_tag() {
     echo "${tag[*]}"
 }
 
+####
+# 设置TAG相关的全局变量
+####
 function set_tag() {
     # for (( i = 0; i < ${#TAGS[@]}; i++ )); do
     #     echo ${TAGS[$i]}
@@ -165,15 +175,11 @@ function get_author() {
 function all_log() {
     if [[ -n "$_CURRENT_TAG" ]]; then
         set_tag "$_CURRENT_TAG"
-        get_all_author
         simple_log
-        unset AUTHORS
     else
         for tag in "${TAGS[@]}"; do
             set_tag "$tag"
-            get_all_author
             simple_log
-            unset AUTHORS
         done
     fi
 
@@ -182,6 +188,7 @@ function all_log() {
 # 直接输出日志到在终端
 #####
 function simple_log() {
+    get_all_author
     if [[ -n "$_OUTPUT" ]]; then
         echo "# ${CURRENT_TAG[2]}" >> "$_OUTPUT"
         echo "" >> "$_OUTPUT"
@@ -215,6 +222,7 @@ function simple_log() {
         unset _author
         unset _cmd
     done
+    unset AUTHORS
 }
 #####
 # 使用帮助
@@ -246,8 +254,7 @@ case $1 in
         help
         ;;
     * )
-        init "$@"
-        # simple_log
+        main "$@"
         exit
         ;;
 esac
