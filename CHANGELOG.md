@@ -1,3 +1,30 @@
+# git-toolkit-1.1
+
+
+#### [Tony Deng ](wolf.deng@gmail.com) (15)
+
+* fix(1.1): 解决clog没有安装问题；去掉array自定义模块，避免出现软连接时无法找到module的问题 (2017-04-25 15:41:00) [view commit 2850d9c](https://github.com/tonydeng/git-toolkit/commit/2850d9c)  
+* docs(1.1): 补全clog的README文档 (2017-04-25 15:24:57) [view commit aff7ee7](https://github.com/tonydeng/git-toolkit/commit/aff7ee7)  
+* docs(1.1): 添加changelog.md (2017-04-25 15:17:25) [view commit b36c1a2](https://github.com/tonydeng/git-toolkit/commit/b36c1a2)  
+* chore(1.1): 调整相关注释和方法调用顺序 (2017-04-25 15:07:07) [view commit 7ced562](https://github.com/tonydeng/git-toolkit/commit/7ced562)  
+* fix(1.1): 解决当项目版本中有多个"-"符号之后出现的无法输出日志的问题 (2017-04-25 14:40:23) [view commit 0d10dc0](https://github.com/tonydeng/git-toolkit/commit/0d10dc0)  
+* chore(1.1): 删除不需要的目录 (2017-04-25 12:54:02) [view commit 664d115](https://github.com/tonydeng/git-toolkit/commit/664d115)  
+* feat(1.1): 完成changelog的基本功能 (2017-04-25 12:47:42) [view commit 3144cb7](https://github.com/tonydeng/git-toolkit/commit/3144cb7)  
+* feat(1.1): 解决获取作者时的无法构建正常数组的问题 (2017-04-24 19:13:35) [view commit 1965591](https://github.com/tonydeng/git-toolkit/commit/1965591)  
+* feat(1.1): 完成版本和作者的数组组装，以及输出基本的日志 (2017-04-22 00:22:38) [view commit a0a667c](https://github.com/tonydeng/git-toolkit/commit/a0a667c)  
+* feat(1.1): 添加版本验证功能，添加获取版本列表、作者列表等功能 (2017-04-21 12:23:12) [view commit bae5654](https://github.com/tonydeng/git-toolkit/commit/bae5654)  
+* feat(1.1): 添加数组倒序功能，并且加入模块化编程概念 (2017-04-20 12:10:26) [view commit 97d1ffc](https://github.com/tonydeng/git-toolkit/commit/97d1ffc)  
+* feat(1.0): 添加获取作者的方法 (2017-04-19 18:36:03) [view commit dec31cb](https://github.com/tonydeng/git-toolkit/commit/dec31cb)  
+* feat(1.1): 添加clog命令 (2017-04-19 15:11:00) [view commit 289e08f](https://github.com/tonydeng/git-toolkit/commit/289e08f)  
+* feat(1.0.3): 调整仓库地址为cimhealth (2016-12-27 19:08:09) [view commit 1449c5d](https://github.com/tonydeng/git-toolkit/commit/1449c5d)  
+* fix(1.0.3): 调整可输入commit message字符长度 (2016-12-06 15:04:43) [view commit 8652769](https://github.com/tonydeng/git-toolkit/commit/8652769)  
+
+#### [dinghao2020 ](18001326539@163.com) (3)
+
+* 修复逻辑执行错误 (2017-02-16 11:58:20) [view commit b19ff0e](https://github.com/tonydeng/git-toolkit/commit/b19ff0e)  
+* fix install on linux (2017-02-16 10:45:35) [view commit 8125553](https://github.com/tonydeng/git-toolkit/commit/8125553)  
+* Update installer.sh (2017-02-15 23:42:16) [view commit 05caa40](https://github.com/tonydeng/git-toolkit/commit/05caa40)  
+
 # git-toolkit-1.0.2
 
 
