@@ -5,7 +5,7 @@ function init() {
     for l in "${LOCALE[@]}" ; do
         export "$l=$LANGUAGE"
     done
-    TYPE=(backlog feat fix docs style refactor test chore)
+    TYPE=(":sparkles: feat" ":bug:fix" ":memo: docs" ":art: style" ":hammer: refactor" ":white_check_mark: test" ":wrench: chore" ":zap: perf")
 }
 
 # 验证当前是否为Git项目
@@ -20,15 +20,15 @@ function verify {
 # 消息主体
 function mainMessage() {
     echo "选择您正在提交的类型:
-        1. backlog: 开始一个新的backlog
-        2. feat: 新功能（feature）
-        3. fix: 修补bug
-        4. docs: 文档（documentation）
-        5. style: 格式（不影响代码运行的变动）
-        6. refactor: 重构（即不是新增功能，也不是修改bug的代码变动）
-        7. test: 增加测试
-        8. chore: 构建过程或辅助工具的变动
-        0. quit: 退出
+        1. feat: 新功能（ Introducing new features ）
+        2. fix: 修补bug ( Fixing a bug )
+        3. docs: 文档（ Writing docs ）
+        4. style: 格式（ Improving structure / format of the code ）
+        5. refactor: 重构（ Refactoring code ）
+        6. test: 增加测试 ( Adding tests )
+        7. chore: 构建过程或辅助工具的变动 ( Changing configuration files. )
+        8. perf:  改善性能 ( Improving performance )
+        0. quit: 退出 ( Exit )
     "
     read -e -n 1 -p "请选择相关数字选项 [0-8]> "
 
@@ -58,7 +58,7 @@ function otherMessage() {
 }
 # 构建消息
 function build() {
-    if [[ -z $@ ]]; then
+    if [ -z "$*" ]; then
         ALL="-a"
     else
         ALL=$*

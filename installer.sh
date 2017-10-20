@@ -15,7 +15,7 @@ function init() {
     fi
 
     if [[ -z "$REPO_HOME" ]]; then
-        REPO_HOME="https://github.com/cimhealth/git-toolkit.git"
+        REPO_HOME="https://github.com/tonydeng/git-toolkit.git"
     fi
 
     COMAND_PATHS=("/usr/local/bin" "$USER_HOME/bin")
