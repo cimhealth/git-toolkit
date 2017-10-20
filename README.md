@@ -8,13 +8,13 @@
 **使用curl**
 
 ```bash
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/cimhealth/git-toolkit/master/installer.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh)"
 ```
 
 **使用wget**
 
 ```bash
-bash -c "$(wget https://raw.githubusercontent.com/cimhealth/git-toolkit/master/installer.sh -O -)"
+bash -c "$(wget https://raw.githubusercontent.com/tonydeng/git-toolkit/master/installer.sh -O -)"
 ```
 
 ## git toolkit介绍
@@ -53,16 +53,17 @@ git toolkit update
 
 ```bash
 git ci
+
 选择您正在提交的类型:
-        1. backlog: 开始一个新的backlog
-        2. feat: 新功能（feature）
-        3. fix: 修补bug
-        4. docs: 文档（documentation）
-        5. style: 格式（不影响代码运行的变动）
-        6. refactor: 重构（即不是新增功能，也不是修改bug的代码变动）
-        7. test: 增加测试
-        8. chore: 构建过程或辅助工具的变动
-        0. quit: 退出
+        1. feat: 新功能（ Introducing new features ）
+        2. fix: 修补bug ( Fixing a bug )
+        3. docs: 文档（ Writing docs ）
+        4. style: 格式（ Improving structure / format of the code ）
+        5. refactor: 重构（ Refactoring code ）
+        6. test: 增加测试 ( Adding tests )
+        7. chore: 构建过程或辅助工具的变动 ( Changing configuration files. )
+        8. perf:  改善性能 ( Improving performance )
+        0. quit: 退出 ( Exit )
 ```    
 
 #### git clog
