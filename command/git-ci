@@ -5,7 +5,7 @@ function init() {
     for l in "${LOCALE[@]}" ; do
         export "$l=$LANGUAGE"
     done
-    TYPE=(":sparkles: feat" ":bug:fix" ":memo: docs" ":art: style" ":hammer: refactor" ":white_check_mark: test" ":wrench: chore" ":zap: perf")
+    TYPE=(":sparkles: feat" ":bug: fix" ":memo: docs" ":art: style" ":hammer: refactor" ":white_check_mark: test" ":wrench: chore" ":zap: perf")
 }
 
 # 验证当前是否为Git项目
