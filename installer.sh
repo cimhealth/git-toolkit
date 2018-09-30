@@ -79,6 +79,7 @@ function install() {
     clone
     install_cmd
     install_config
+    install_alias
     install_hooks
 }
 
@@ -120,6 +121,16 @@ function install_config() {
         git config --global --unset alias.ci
     fi
     git config --global commit.template "$INSTALL_PATH/$CONFIG/$TEMPLATE_FILES"
+}
+
+# 配置别名
+function install_alias() {
+    echo "Install Git Alias Config......"
+    git config --global alias.co 'checkout'
+    git config --global alias.br 'branch'
+    git config --global alias.st 'status'
+    git config --global alias.lg "log --oneline  --decorate --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen (%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+    git config --global alias.mrg "merge --no-ff"
 }
 
 # 安装hook脚本
