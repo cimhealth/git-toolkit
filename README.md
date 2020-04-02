@@ -70,7 +70,7 @@ git ci
 
 提供项目的`CHANGELOG`输出，支持输出到终端或指定文件中，可以使用`git clog -h`来查看帮助信息。
 
-输出的格式大致如下，符合`Markdown`语法：
+输出的格式大致如下，符合`Markdown`语法([查看样例](CHANGELOG.md))：
 
 ```
 # tag
@@ -83,7 +83,7 @@ git ci
 
 显示效果如下：
 
-![git-toolkit changelog](http://i1.piimg.com/567571/0ac12a53247a0fec.jpg)
+![git-toolkit changelog](changelog.jpg)
 
 ### Hook脚本
 
